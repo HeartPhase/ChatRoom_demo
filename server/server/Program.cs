@@ -43,6 +43,8 @@ namespace myServer
             return null;
         }
 
+
+        //广播信息，同时清除断连客户
         public static void BroadcastMessage(string message)
         {
             var notConnectedList = new List<ForClient>();
