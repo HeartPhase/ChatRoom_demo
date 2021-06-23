@@ -69,8 +69,9 @@ namespace myServer
                             while (data[i]!=op0) {
                                 i++;
                             }
+                            String name = Encoding.UTF8.GetString(data, 2, i - 1);
                             String message = Encoding.UTF8.GetString(data,i+1,length);
-                            Console.WriteLine("收到了客户端：" + socketclient.RemoteEndPoint + "  " + "消息: " + message);
+                            Console.WriteLine("收到了客户端：" + socketclient.RemoteEndPoint + "  " + "消息: " + message+" "+"用户名: "+name);
                         }
                         //广播这个消息
                         Program.BroadcastMessage(data);
