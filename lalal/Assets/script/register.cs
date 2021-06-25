@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
@@ -19,19 +20,13 @@ public class register : MonoBehaviour
     //op开头是操作码
     private byte op0 = 0;//握手
     private byte op1 = 1;//发送信息
+    private byte op2 = 2;//系统消息，无用户名
     private byte op6 = 6;//服务端报错码
     public GameObject chatRoomPage;
+    public GameObject chatRoom;
     void Start()
     {
         ConnectToServer();
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Return))
-        {
-            registration();
-        }
     }
 
 
@@ -55,7 +50,7 @@ public class register : MonoBehaviour
         byte[] pack = new byte[data.Length + op.Length];
         op.CopyTo(pack, 0);
         data.CopyTo(pack, op.Length);
-        Debug.Log("username  package generated, length is: "+pack.Length);
+        Debug.Log("username package generated, length is: "+pack.Length);
         return pack;
     }
 
@@ -76,11 +71,13 @@ public class register : MonoBehaviour
             //Debug.Log(getservermsglength+" , "+ userMessage.Length);
             if (buff[1] == op0) { //此处证明该用户注册用户名成功
                 Debug.Log("用户名注册成功！");
+                //这里是场景的转换
                 this.GetComponent<Canvas>().enabled = false;
-                chatRoomPage.GetComponent<chatRoom>().TcpClient = this.socket;
-                chatRoomPage.GetComponent<chatRoom>().userName=this.userName;
-                chatRoomPage.GetComponent<chatRoom>().initialConnect();
-                
+                chatRoom.GetComponent<chatRoom>().enabled = true;
+                chatRoom.GetComponent<chatRoom>().initialConnect(this.socket,this.userName);
+                chatRoomPage.GetComponent<Canvas>().enabled = true;
+                this.GetComponent<register>().enabled = false;
+                Destroy(this,1.0f);
             }
         }
     }

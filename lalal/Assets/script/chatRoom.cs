@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
@@ -15,23 +16,23 @@ public class chatRoom : MonoBehaviour
     //op开头是操作码
     private byte op0 = 0;//握手
     private byte op1 = 1;//发送信息
+    private byte op2 = 2;//系统消息，无用户名
     private byte op6 = 6;//服务端报错码
-    string getmsg, oldmessage;
+    string getmsg;
     private Thread thread;
     public Text te;
     public ScrollRect scrollRect;
     public String userName;
+    private String tempName;
+    private String tempMessage;
     // Use this for initialization
 
-    public chatRoom(Socket s,String userName) {
-        this.TcpClient = s;
-        this.userName = userName;
-    }
 
     void Start()
     {
-        startChat();
-
+        tempMessage = "";
+        tempName = "";
+        inputcontext.text = "";
     }
 
     // Update is called once per frame
@@ -44,19 +45,35 @@ public class chatRoom : MonoBehaviour
             oldmessage = getmsg;
         }
         */
-        if (getmsg != null )
-        {
-            te.text += getmsg + "\n";
-            getmsg = null;
+        if (tempMessage!="" && tempName!="") {
+            if (tempName == userName)
+            {
+                te.alignment = TextAnchor.UpperRight;
+                String temp = tempMessage+"<color=red> :" + tempName + "</color>" ;
+                te.text += temp+"\n";
+                tempMessage = "";
+                tempName = "";
+            }
+            else {
+                te.alignment = TextAnchor.UpperLeft;
+                String temp = "<color=blue>" + tempName + "</color>: " + tempMessage;
+                te.text += temp+"\n";
+                tempMessage = ""; 
+                tempName = "";
+            }
+            
+
+            //inputcontext.ActivateInputField();
             Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = 0f;
             Canvas.ForceUpdateCanvases();
         }
-        
-        if (Input.GetKeyUp(KeyCode.Return)) {
-            ButtonOnClickEvent();
-        }
 
+        if (Input.GetKeyUp(KeyCode.Return))
+        {
+            ButtonOnClickEvent(); 
+            
+        }   
         
     }
     void startChat()
@@ -66,7 +83,7 @@ public class chatRoom : MonoBehaviour
         thread.Start();
     }
 
-    public void SendMessageToServer(string message)//开始打包聊天消息 01 | userName | message
+    public void SendMessageToServer(string message)//开始打包聊天消息 01 | userName | 0 | message
     {
         byte[] op = new byte[] {0,1};
         byte[] name = Encoding.UTF8.GetBytes(this.userName);
@@ -84,11 +101,10 @@ public class chatRoom : MonoBehaviour
         
     }
 
-    public void initialConnect() {
-        //this.TcpClient = s;
-        //this.userName = userName;
-        this.GetComponent<Canvas>().enabled = true;
-        Debug.Log(this.TcpClient);
+    public void initialConnect(Socket s, String userName) {
+        this.TcpClient = s;
+        this.userName = userName;
+        startChat();
     }
 
     public void GetmessageFromServer()
@@ -105,45 +121,70 @@ public class chatRoom : MonoBehaviour
             }
             TcpClient.ReceiveTimeout = 100000;
             int length = TcpClient.Receive(data);
+            //Debug.Log(length);
             if (length==0) {
                 Debug.Log("disconnect");
                 TcpClient.Close();
                 break; 
             }
             if (data[1]==op1) {
-                Debug.Log("reciev a b mes from server");
-                int i = 2;
-                while (data[i] != op0)
+                //Debug.Log("reciev a b mes from server");
+                int i = 0;
+                while (data[i+2] != op0)
                 {
                     i++;
                 }
-                String name = Encoding.UTF8.GetString(data, 2, i-1);
-                String message = Encoding.UTF8.GetString(data, i + 1, length);
-                Debug.Log(name+" : "+message);
-                if (name==userName) {
-                    Debug.Log("My message");
-                    getmsg = "<alignment=right>" + name + "</color>: " + message;
+                int j = i+2+1;
+                while (data[j]!=op0) {
+                    j++;
                 }
-                getmsg =  "<color=red>" + name + "</color>: " + message;
+                j = j - i - 3;
+                tempName = Encoding.UTF8.GetString(data, 2, i);
+                tempMessage = Encoding.UTF8.GetString(data, i+3, j);
+
             }
             data = new byte[1024];
-            //Debug.Log(getmsg);
 
         }
     }
 
+    /// <summary>
+    /// 截取字节数组, 从网上复制
+    /// </summary>
+    /// <param name="srcBytes">要截取的字节数组</param>
+    /// <param name="startIndex">开始截取位置的索引</param>
+    /// <param name="length">要截取的字节长度</param>
+    /// <returns>截取后的字节数组</returns>
+    public byte[] SubByte(byte[] srcBytes, int startIndex, int length)
+    {
+        System.IO.MemoryStream bufferStream = new System.IO.MemoryStream();
+        byte[] returnByte = new byte[] { };
+        if (srcBytes == null) { return returnByte; }
+        if (startIndex < 0) { startIndex = 0; }
+        if (startIndex < srcBytes.Length)
+        {
+            if (length < 1 || length > srcBytes.Length - startIndex) { length = srcBytes.Length - startIndex; }
+            bufferStream.Write(srcBytes, startIndex, length);
+            returnByte = bufferStream.ToArray();
+            bufferStream.SetLength(0);
+            bufferStream.Position = 0;
+        }
+        bufferStream.Close();
+        bufferStream.Dispose();
+        return returnByte;
+    }
+
     public void ButtonOnClickEvent()
     {
-        //Debug.Log("button is clicked");
         string getmessages = inputcontext.text;
-
-        if (getmessages != "")
+        if (getmessages != ""|| getmessages != null)
         {
             SendMessageToServer(getmessages);
-            inputcontext.text = null;
-            Debug.Log(getmessages);
+            Debug.Log("type: " + getmessages.Length);
+            inputcontext.text ="";
+            //Debug.Log(getmessages);
         }
-        //else { Debug.Log("no word"); }
+        else { Debug.Log("no word"); }
     }
     //该函数只有打包之后才有用，平时运行无效
     public void quit() {

@@ -48,11 +48,12 @@ namespace myServer
                     try
                     {
                         int length = socketclient.Receive(data);
+                        byte[] temp = new byte[length];
                         if (data[1]==op0) {//用户名申请
                             String userName =Encoding.UTF8.GetString(data, 2, length);
                             if (!Program.nameIsExit(userName)) {
-                                byte[] temp = new byte[] {0,0};
-                                SendMessage(temp);
+                                byte[] op = new byte[] {0,0};
+                                SendMessage(op);
                                 this.name = userName;
                                 registed = true;
                                 Console.WriteLine("客户端：" + socketclient.RemoteEndPoint +"  注册用户名成功："+name);
@@ -62,7 +63,7 @@ namespace myServer
 
                         if (data[1]==op1) {//接受聊天数据
                             if (!registed) {//未注册不得聊天
-                                Console.WriteLine("客户端未注册用户名，不得聊天");
+                                Console.WriteLine("客户端未注册用户名，不得聊天: "+ socketclient.RemoteEndPoint);
                                 continue;
                             }
                             int i = 2;
@@ -86,6 +87,32 @@ namespace myServer
             }
         }
 
+
+        /// <summary>
+        /// 截取字节数组, 从网上复制
+        /// </summary>
+        /// <param name="srcBytes">要截取的字节数组</param>
+        /// <param name="startIndex">开始截取位置的索引</param>
+        /// <param name="length">要截取的字节长度</param>
+        /// <returns>截取后的字节数组</returns>
+        public byte[] SubByte(byte[] srcBytes, int startIndex, int length)
+        {
+            System.IO.MemoryStream bufferStream = new System.IO.MemoryStream();
+            byte[] returnByte = new byte[] { };
+            if (srcBytes == null) { return returnByte; }
+            if (startIndex < 0) { startIndex = 0; }
+            if (startIndex < srcBytes.Length)
+            {
+                if (length < 1 || length > srcBytes.Length - startIndex) { length = srcBytes.Length - startIndex; }
+                bufferStream.Write(srcBytes, startIndex, length);
+                returnByte = bufferStream.ToArray();
+                bufferStream.SetLength(0);
+                bufferStream.Position = 0;
+            }
+            bufferStream.Close();
+            bufferStream.Dispose();
+            return returnByte;
+        }
 
         
         public bool nameIsMacth(String userName) {
