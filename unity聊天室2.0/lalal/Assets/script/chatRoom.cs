@@ -25,6 +25,7 @@ public class chatRoom : MonoBehaviour
     public String userName;
     private String tempName;
     private String tempMessage;
+    private String tempSys;
     // Use this for initialization
 
 
@@ -32,42 +33,36 @@ public class chatRoom : MonoBehaviour
     {
         tempMessage = "";
         tempName = "";
+        tempSys = "";
         inputcontext.text = "";
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (getmsg != null && getmsg != oldmessage)
-        {
-            te.text += getmsg + "\n";
-            oldmessage = getmsg;
-        }
-        */
-        if (tempMessage!="" && tempName!="") {
+        
+        if (tempMessage != "" && tempName != "") {
             if (tempName == userName)
             {
-                te.alignment = TextAnchor.UpperRight;
-                String temp = tempMessage+"<color=red> :" + tempName + "</color>" ;
-                te.text += temp+"\n";
+                String temp =  "<color=red>" + tempName + "</color>: "+ tempMessage;
+                te.text += temp + "\n";
                 tempMessage = "";
                 tempName = "";
             }
             else {
-                te.alignment = TextAnchor.UpperLeft;
                 String temp = "<color=blue>" + tempName + "</color>: " + tempMessage;
-                te.text += temp+"\n";
-                tempMessage = ""; 
+                te.text += temp + "\n";
+                tempMessage = "";
                 tempName = "";
             }
-            
-
             //inputcontext.ActivateInputField();
             Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = 0f;
             Canvas.ForceUpdateCanvases();
         }
+        
+        
+
 
         if (Input.GetKeyUp(KeyCode.Return))
         {
@@ -127,21 +122,24 @@ public class chatRoom : MonoBehaviour
                 TcpClient.Close();
                 break; 
             }
-            if (data[1]==op1) {
+            if (data[1] == op1) {
                 //Debug.Log("reciev a b mes from server");
                 int i = 0;
-                while (data[i+2] != op0)
+                while (data[i + 2] != op0)
                 {
                     i++;
                 }
-                int j = i+2+1;
-                while (data[j]!=op0) {
+                int j = i + 2 + 1;
+                while (data[j] != op0) {
                     j++;
                 }
                 j = j - i - 3;
                 tempName = Encoding.UTF8.GetString(data, 2, i);
-                tempMessage = Encoding.UTF8.GetString(data, i+3, j);
+                tempMessage = Encoding.UTF8.GetString(data, i + 3, j);
 
+            }
+            else if (data[1]==op2) { 
+                tempSys= Encoding.UTF8.GetString(data, 2, length-2);
             }
             data = new byte[1024];
 

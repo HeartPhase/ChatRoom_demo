@@ -56,6 +56,7 @@ namespace myServer
                                 SendMessage(op);
                                 this.name = userName;
                                 registed = true;
+                                //Program.BroadcastMessage(registerIsSuccess(name));
                                 Console.WriteLine("客户端：" + socketclient.RemoteEndPoint +"  注册用户名成功："+name);
                             }
                             
@@ -87,6 +88,16 @@ namespace myServer
             }
         }
 
+        public byte[] registerIsSuccess(String userName) {
+            byte[] op = new byte[] {0,2};
+            String msg = "该用户已进入聊天室："+userName;
+            Console.WriteLine(msg);
+            byte[] sys= Encoding.UTF8.GetBytes(msg);
+            byte[] success = new byte[op.Length+sys.Length];
+            op.CopyTo(success,0);
+            sys.CopyTo(success,op.Length);
+            return success;
+        }
 
         /// <summary>
         /// 截取字节数组, 从网上复制

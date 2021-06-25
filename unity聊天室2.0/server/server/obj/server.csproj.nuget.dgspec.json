@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\git\\multiplay_fps_game-\\server\\server\\server.csproj": {}
+    "D:\\git\\multiplay_fps_game-\\unity聊天室2.0\\server\\server\\server.csproj": {}
   },
   "projects": {
-    "D:\\git\\multiplay_fps_game-\\server\\server\\server.csproj": {
+    "D:\\git\\multiplay_fps_game-\\unity聊天室2.0\\server\\server\\server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\git\\multiplay_fps_game-\\server\\server\\server.csproj",
+        "projectUniqueName": "D:\\git\\multiplay_fps_game-\\unity聊天室2.0\\server\\server\\server.csproj",
         "projectName": "server",
-        "projectPath": "D:\\git\\multiplay_fps_game-\\server\\server\\server.csproj",
+        "projectPath": "D:\\git\\multiplay_fps_game-\\unity聊天室2.0\\server\\server\\server.csproj",
         "packagesPath": "C:\\Users\\87066\\.nuget\\packages\\",
-        "outputPath": "D:\\git\\multiplay_fps_game-\\server\\server\\obj\\",
+        "outputPath": "D:\\git\\multiplay_fps_game-\\unity聊天室2.0\\server\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

@@ -502,8 +502,16 @@ PrefabInstance:
       value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 3255384410376227387, guid: cef0baed6b73cc446be245519a87f1ed, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255384410376227387, guid: cef0baed6b73cc446be245519a87f1ed, type: 3}
       propertyPath: m_FontData.m_LineSpacing
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255384410376227387, guid: cef0baed6b73cc446be245519a87f1ed, type: 3}
+      propertyPath: m_FontData.m_AlignByGeometry
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3255384410719710663, guid: cef0baed6b73cc446be245519a87f1ed, type: 3}
       propertyPath: m_Name
